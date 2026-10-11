@@ -1,0 +1,2 @@
+# Preserve exact HTML bytes required by the baseline checksum.
+*.html -text
