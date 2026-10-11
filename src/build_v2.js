@@ -1,15 +1,15 @@
 'use strict';
-/* GAME-002 独立构建器（redline-v2）
-   流程：读**已校验基线** game-v1.1.html（断言其 SHA256 = 正式页）→ 依次应用 v2 补丁 → 写 game-v2.html。
+/* GAME-003 独立构建器（redline-v3）
+   流程：读**已校验基线** game-v1.1.html（断言其 SHA256 = 正式页）→ 依次应用 v2 补丁 → 写 game-v3.html。
    保证：① 不改基线文件；② 输出只写新文件；③ 每条补丁报命中数，missed 必须显式列出；④ 可重复（同输入同输出）。
-   用法：node src/build_v2.js   （cwd = work/redline-v2） */
+   用法：node src/build_v2.js   （cwd = work/redline-v3） */
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const sha = b => crypto.createHash('sha256').update(b).digest('hex');
 const ROOT = path.resolve(__dirname, '..');
 const BASE = path.join(ROOT, 'game-v1.1.html');
-const OUT = path.join(ROOT, 'game-v2.html');
+const OUT = path.join(ROOT, 'game-v3.html');
 const EXPECT_BASE = 'a2980ea59588174878f1cccb359637e22f692cab83041c884362874971748070';
 
 const baseBuf = fs.readFileSync(BASE);
@@ -22,13 +22,13 @@ const patches = [require('./patch_v20_game002.js')];
 if (process.env.M2 === '1') patches.push(require('./patch_m2_balance.js'));
 if (process.env.M3 !== '0') patches.push(require('./patch_m3_game002.js'));
 let html = baseBuf.toString('utf8');
-const report = { kind: 'redline-v2-build', base: { file: 'game-v1.1.html', sha256: baseSha, bytes: baseBuf.length }, patches: [], missed: [] };
+const report = { kind: 'redline-v3-build', base: { file: 'game-v1.1.html', sha256: baseSha, bytes: baseBuf.length }, patches: [], missed: [] };
 for (const p of patches) {
   const r = p.apply(html);
   /* 任一补丁未命中 → **throw，不写任何产物**（不半应用） */
   if (r.ok === false) {
     console.error('PATCH-MISSED ' + p.name + ' :: ' + r.missed.map(m => m.id).join(',') + ' → 拒绝构建，不写产物');
-    fs.writeFileSync(path.join(ROOT, 'build-v2-report.json'), JSON.stringify({ kind: 'redline-v2-build', failed: 'patch-missed', patch: p.name, missed: r.missed }, null, 2), 'utf8');
+    fs.writeFileSync(path.join(ROOT, 'build-v2-report.json'), JSON.stringify({ kind: 'redline-v3-build', failed: 'patch-missed', patch: p.name, missed: r.missed }, null, 2), 'utf8');
     process.exit(4);
   }
   html = r.html;
@@ -39,7 +39,7 @@ for (const p of patches) {
 }
 fs.writeFileSync(OUT, Buffer.from(html, 'utf8'));
 const outBuf = fs.readFileSync(OUT);
-report.out = { file: 'game-v2.html', sha256: sha(outBuf), bytes: outBuf.length };
+report.out = { file: 'game-v3.html', sha256: sha(outBuf), bytes: outBuf.length };
 report.idempotentCheck = (function () {                 /* 重复应用应得同一结果 */
   let h2 = baseBuf.toString('utf8');
   for (const p of patches) h2 = p.apply(h2).html;

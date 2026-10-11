@@ -10,4 +10,4 @@ const result = spawnSync(process.execPath, [path.join(__dirname, 'build_v2.js')]
 });
 if (result.error) throw result.error;
 if (result.status !== 0) process.exit(result.status || 1);
-fs.copyFileSync(path.join(root, 'game-v2.html'), path.join(root, 'index.html'));
+fs.copyFileSync(path.join(root, 'game-v3.html'), path.join(root, 'index.html'));

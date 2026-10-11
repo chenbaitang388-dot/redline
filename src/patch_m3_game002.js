@@ -1,9 +1,9 @@
 'use strict';
-/* GAME-002 M3 补丁（整体重写版）：MAX_LEVELS24 + LEVELS 首帧 24 行 + 真实 startWave wire + 三类真实目标
+/* GAME-003 M3 补丁（整体重写版）：MAX_LEVELS24 + LEVELS 首帧 24 行 + 真实 startWave wire + 三类真实目标
    仅 3 条编辑：① MAX_LEVELS 12->24 ② startWave 真实 hook ③ 顶层单块注入（全部 M3 代码）
    要求：不吞 wire 错误（记录到 window.__M3WIRE.err）；LEVELS 在首次开局前补齐 24 行。 */
 const M3CODE = `
-/* ===== GAME-002 M3：24 关 / 10 档 / 三类真实目标 ===== */
+/* ===== GAME-003 M3：24 关 / 10 档 / 三类真实目标 ===== */
 window.__M3WIRE = { calls: 0, last: null, err: null };
 var M3_BOSS_LEVELS = [4,8,12,16,20,24];
 var M3_BASE_STAGES = (function(){
@@ -59,10 +59,10 @@ function m3SyncGoalLevels(){ var o=null,r=null,d=null;
   if(o)M3.level=o; if(r)M3R.level=r; if(d)M3D.level=d; }
 m3SyncGoalLevels();
 /* ---- 据点守卫 ---- */
-function m3Reset(){ M3.inited=false; M3.cleared=false; M3.failed=false; M3.t0=null; M3.hp=M3.maxHp; }
+function m3Reset(){ M3.inited=false; M3.cleared=false; M3.failed=false; M3.t0=null; M3.hp=M3.maxHp; M3.topUp=0; M3.nextRefillAt=null; }
 function m3Hide(){ ['m3fx','m3bar','m3hud'].forEach(function(id){ var d=document.getElementById(id); if(d)d.style.display='none'; }); }
 function m3Active(){ try{ return M3.on && G.state==='play' && m3GoalOf(G.wave)==='outpost'; }catch(e){ return false; } }
-function m3Init(){ M3.inited=true; M3.hp=M3.maxHp; M3.t0=(G.time===undefined?0:G.time); M3.cleared=false; M3.failed=false; }
+function m3Init(){ M3.inited=true; M3.hp=M3.maxHp; M3.t0=(G.time===undefined?0:G.time); M3.cleared=false; M3.failed=false; M3.topUp=0; M3.nextRefillAt=null; }
 function m3OutpostTick(dt){
   if(!M3.on) return;
   if(m3GoalOf(G.wave)!=='outpost'){ if(M3.inited)m3Reset(); m3Hide(); return; }
@@ -70,9 +70,29 @@ function m3OutpostTick(dt){
   if(!M3.inited) m3Init();
   var n=0; for(var i=0;i<en.length;i++){ var e=en[i]; if(!e||e.dead) continue; if(Math.hypot(e.x-M3.cx,e.y-M3.cy)<=M3.r+(e.r||14)) n++; }
   var eff=Math.min(4,n); if(eff>0) M3.hp=Math.max(0,M3.hp-M3.hitRatePerSec*eff*dt);
+  /* M3 补刷（最小且有限）：仅守卫进行中、deadline 前；按游戏时间间隔触发，活跃上限 cap，每批最多 3 */
+  var __alive=0; for(var q=0;q<en.length;q++){ if(en[q]&&!en[q].dead) __alive++; }
+  var __t0=(M3.t0===null||M3.t0===undefined)?G.time:M3.t0;
+  var __left=M3.deadlineSec-(G.time-__t0);
+  if(M3.failed) return;                                  /* 失败帧不再补刷（hp<=0 交由原失守分支结算） */
+  if(__left > 0 && M3.hp > 0 && !M3.cleared && G.state==='play'){
+    if(M3.nextRefillAt===undefined||M3.nextRefillAt===null) M3.nextRefillAt = G.time + 1.0;
+    var __due = (G.time >= M3.nextRefillAt) || (__alive===0 && (G.spawnQ?G.spawnQ.length:0)===0 && __left<=1.0);
+    if(__due && __alive < 4 && (G.spawnQ?G.spawnQ.length:0)===0){
+      var __row = (typeof LEVELS!=='undefined' && LEVELS[G.wave-1]) ? LEVELS[G.wave-1] : null;
+      var __types = (__row && __row[3] && __row[3].length) ? __row[3] : ['chaser'];
+      var __n = Math.min(3, 4-__alive);
+      for(var s=0;s<__n && typeof spawnEnemy==='function';s++){
+        spawnEnemy(__types[s % __types.length]);   /* 由原函数内部选 spawnPoint 与 rank */
+
+      }
+      M3.topUp = (M3.topUp||0) + __n;
+      M3.nextRefillAt = G.time + 1.0;
+    }
+  }
   if(M3.hp<=0 && !M3.failed){ M3.failed=true; if(typeof gameOver==='function') gameOver(false,'据点失守'); else { G.state='over'; G.win=false; G.reason='据点失守'; } }
   var t0ok=(M3.t0===null||M3.t0===undefined)?G.time:M3.t0;
-  if(!M3.failed && G.time-t0ok>=M3.deadlineSec && !M3.cleared){ M3.cleared=true; try{ toast('据点守卫成功','good'); }catch(e){} }
+  if(!M3.failed && G.time-t0ok>=M3.deadlineSec && !M3.cleared){ M3.cleared=true; if(G.spawnQ) G.spawnQ.length=0; try{ toast('据点守卫成功','good'); }catch(e){} }
   if(!m3CanAdvance() && G.clearT>0.4) G.clearT=0;
   m3Draw(t0ok);
 }
@@ -82,7 +102,7 @@ function m3Draw(t0ok){
     d.style.cssText='position:fixed;right:10px;top:10px;z-index:9998;font:12px monospace;color:#ffd7a0;background:rgba(0,0,0,.5);padding:4px 8px;border-radius:5px;white-space:pre'; document.body.appendChild(d); }
   d.style.display='block';
   var left=Math.max(0,M3.deadlineSec-(G.time-t0ok));
-  d.textContent='当前目标：据点守卫\\n倒计时 '+left.toFixed(1)+' 秒\\n据点耐久 '+Math.max(0,M3.hp).toFixed(1)+'/'+M3.maxHp+'\\n失败条件：耐久归零\\n'+(M3.cleared?'已达成（可清场升关）':(M3.failed?'已失败':'守卫中…'));
+  d.textContent='当前目标：据点守卫\\n倒计时 '+left.toFixed(1)+' 秒\\n据点耐久 '+Math.max(0,M3.hp).toFixed(1)+'/'+M3.maxHp+'\\n失败条件：耐久归零（守卫期间持续来敌，计时结束后清场）\\n'+(M3.cleared?'已达成（可清场升关）':(M3.failed?'已失败':'守卫中…'));
   var r=c.getBoundingClientRect(); var sx=r.left+r.width*(M3.cx/1600), sy=r.top+r.height*(M3.cy/1000), rr=r.width*(M3.r/1600);
   var cv=document.getElementById('m3fx'); if(!cv){ cv=document.createElement('div'); cv.id='m3fx';
     cv.style.cssText='position:fixed;pointer-events:none;z-index:9997;border:2px solid rgba(255,140,60,.75);border-radius:50%;background:rgba(255,140,60,.10)'; document.body.appendChild(cv); }
@@ -165,7 +185,7 @@ function m3CanAdvance(){
   if(needD&&!M3D.done) return false;
   return true;
 }
-window.__M3MANIFEST = { edition:'redline-v2-m3', maxLevels:MAX_LEVELS, difficulties:DIFFICULTIES.length,
+window.__M3MANIFEST = { edition:'redline-v3-m3', maxLevels:MAX_LEVELS, difficulties:DIFFICULTIES.length,
   stages:M3_STAGES.length, goalTypes:['outpost','ritual','danger'], bossLevels:M3_BOSS_LEVELS.slice(),
   goalDistribution:(function(){ var m={}; for(var i=0;i<M3_STAGES.length;i++){ var g=M3_STAGES[i].goal; m[g]=(m[g]||0)+1; } return m; })(),
   levelsLen:(typeof LEVELS!=='undefined'?LEVELS.length:null), stagesTable:M3_STAGES };
@@ -179,7 +199,7 @@ const EDITS = [
     to: 'if(G.clearT>.4){ if(typeof m3CanAdvance===\'function\' ? m3CanAdvance() : true){ G.clearT=0; openUpgrade(); } }' },
   { id: 'm3-unlock-check-page', desc: '页面 infernoUnlocked 改查 campaign24Cleared + edition（防旧 M2 记录误解锁）',
     re: /return !!\(pr&&pr\.infernoUnlocked===true\);/,
-    to: "return !!(pr&&pr.campaign24Cleared===true&&pr.edition==='redline-v2-m3');" },
+    to: "return !!(pr&&pr.campaign24Cleared===true&&pr.edition==='redline-v3-m3');" },
   { id: 'm3-send-campaign24', desc: '页面全程 hell 胜利时同时发送 campaign24-cleared（带 wave/runStart/trialBoss/dkey，由宿主校验）',
     re: /window\.chrome\.webview\.postMessage\(\{type:'hell-campaign-cleared'\}\);/,
     to: "window.chrome.webview.postMessage({type:'hell-campaign-cleared'});window.chrome.webview.postMessage({type:'campaign24-cleared',wave:(typeof G!=='undefined'?G.wave:null),runStart:(typeof G!=='undefined'?G.runStart:null),trialBoss:(typeof G!=='undefined'?!!G.trialBoss:null),dkey:(typeof getDifficulty==='function'?getDifficulty().key:null)});" },

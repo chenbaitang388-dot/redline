@@ -1,8 +1,8 @@
 # 赤刃 · 重铸（REDLINE）
 
-一个使用 HTML、JavaScript 和 Canvas 实现的单机动作游戏项目。当前展示版本为 **v2 M3 实验版**，更新于 2026 年 10 月 11 日。
+一个使用 HTML、JavaScript 和 Canvas 实现的单机动作游戏项目。当前展示版本为 **v3 实验版**，更新于 2026 年 10 月 11 日。
 
-**REDLINE: Reforged** is a single-player action game built with HTML, JavaScript, and Canvas. The current experimental v2 M3 release features 24 campaign stages, 10 difficulty levels, and three objective types: defend a point, interrupt a ritual, and survive moving hazard zones.
+**REDLINE: Reforged** is a single-player action game built with HTML, JavaScript, and Canvas. The current experimental v3 release features 24 campaign stages, 10 difficulty levels, and three objective types: defend a point, interrupt a ritual, and survive moving hazard zones. Version 3 adds continuous enemy reinforcement during outpost defense; reinforcement stops and the spawn queue clears when the defense timer expires.
 
 To play, download this repository and open `index.html` in a desktop browser. Move with WASD, aim with the mouse, use the left/right mouse buttons for light/heavy attacks, Shift to dash, and Esc to pause. AI-assisted development; full manual campaign completion and final balance validation are still pending.
 
@@ -12,6 +12,7 @@ To play, download this repository and open `index.html` in a desktop browser. Mo
 - 10 档难度，可在开始界面选择。
 - 据点守卫、打断仪式、移动危险区限时生存三类关卡目标。
 - 轻重攻击、连击、冲刺与关间升级。
+- v3 新增据点守卫持续补刷：约每游戏秒检查一次补刷，补刷目标上限为 4，每批最多 3；守卫计时结束后停止补刷并清空刷怪队列。
 
 ## 如何试玩
 
@@ -29,13 +30,13 @@ To play, download this repository and open `index.html` in a desktop browser. Mo
 | 冲刺 | Shift |
 | 暂停 | Esc |
 
-详细规则见 [M3 操作说明](docs/controls-m3.md)。
+第三版说明见 [v3 操作说明](docs/controls-v3.md)，基础操作与主线规则见 [M3 操作说明](docs/controls-m3.md)。
 
 ## 文件说明
 
 - `index.html`：当前发布页面，同时包含游戏源代码。
 - `game-v1.1.html`：构建所需的历史基线。
-- `src/`：v2 构建器与 M2、M3 补丁。
+- `src/`：v3 构建器与基础平衡、主线目标及守卫补刷补丁。
 - `host/GameHost.cs`：Windows WebView2 宿主源代码，仅作开发参考；网页试玩无需此文件。
 - `docs/`：操作与版本说明。
 
@@ -47,7 +48,7 @@ To play, download this repository and open `index.html` in a desktop browser. Mo
 npm run build
 ```
 
-构建会应用 M2 和 M3 补丁，生成 `game-v2.html` 并更新 `index.html`。不要直接修改历史基线，否则构建器的哈希校验会拒绝构建。
+构建会应用基础平衡和 v3 主线目标补丁，生成 `game-v3.html` 并更新 `index.html`。不要直接修改历史基线，否则构建器的哈希校验会拒绝构建。
 
 ## 当前状态
 

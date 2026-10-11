@@ -8,5 +8,9 @@ node_modules/
 .test-data*/
 build-v2-report.json
 game-v2.html
+game-v3.html
+.unlock-test-data*/
+progress*.json
+progress*.tmp
 Thumbs.db
 .DS_Store

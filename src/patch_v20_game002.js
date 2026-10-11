@@ -1,5 +1,5 @@
 'use strict';
-/* GAME-002 v2 独立补丁（redline-v2 专用；**不改生成页基线**）
+/* GAME-003 v2 独立补丁（redline-v3 专用；**不改生成页基线**）
    规则：每条编辑必须**报实际命中数**；命中 0 → 记入 missed（不静默、不伪称完成）。
    用法：由 src/build_v2.js 调用；本文件不写任何文件。 */
 const EDITS = [
@@ -18,21 +18,21 @@ const EDITS = [
     id: 'version-mark',
     desc: '写入新版版本标记（**追加到文件末尾**，避免落在页面脚本内部）',
     re: /$/,
-    to: '\n<script>window.__REDLINE_BUILD__={edition:"redline-v2",game002:true,ai:false};</script>\n',
+    to: '\n<script>window.__REDLINE_BUILD__={edition:"redline-v3",game002:true,ai:false};</script>\n',
     expect: 1
   },
   {
     id: 'edition-marker',
     desc: '追加新版身份标记（文件末尾；供宿主自检读取 edition/ai 状态）',
     re: /$/,
-    to: '\n<script>window.__REDLINE_BUILD__={edition:"redline-v2",game002:true,ai:false,aiLocked:true};</script>\n',
+    to: '\n<script>window.__REDLINE_BUILD__={edition:"redline-v3",game002:true,ai:false,aiLocked:true};</script>\n',
     expect: 1
   },
   {
     id: 'title-v2',
-    desc: '页面标题标注新版（赤刃·重铸v2 实验版）',
+    desc: '页面标题标注新版（赤刃·重铸v3 实验版）',
     re: /<title>[^<]{0,80}<\/title>/,
-    to: '<title>赤刃·重铸v2 实验版</title>',
+    to: '<title>赤刃·重铸v3 实验版</title>',
     expect: 1
   }
 ];

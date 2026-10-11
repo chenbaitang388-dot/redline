@@ -26,7 +26,7 @@ internal sealed class GameWindow : Form
     private Label loading;
     private string DataDirectory
     {
-        get { return Path.Combine(root, unlockMode ? ".unlock-test-data-v2" : testMode ? ".test-data-v2" : ".game-data-v2"); }
+        get { return Path.Combine(root, unlockMode ? ".unlock-test-data-v3" : testMode ? ".test-data-v3" : ".game-data-v3"); }
     }
 
     internal GameWindow(string[] args)
@@ -36,14 +36,14 @@ internal sealed class GameWindow : Form
         unlockMode = args.Length >= 2 && (args[0] == "--unlock-test" || restoreMode);
         testMode = args.Length >= 2 && (args[0] == "--self-test" || gestureMode || unlockMode);
         testOutput = testMode ? Path.GetFullPath(args[1]) : null;
-        Text = "赤刃·重铸v2 实验版";
+        Text = "赤刃·重铸v3 实验版";
         StartPosition = FormStartPosition.CenterScreen;
         ClientSize = new Size(1440, 900);
         MinimumSize = new Size(980, 640);
         BackColor = Color.FromArgb(7, 6, 10);
         view.Dock = DockStyle.Fill;
         Controls.Add(view);
-        loading = new Label { Text = "赤刃·重铸v2 实验版\n正在加载本地游戏（v2 分支）…",
+        loading = new Label { Text = "赤刃·重铸v3 实验版\n正在加载本地游戏（v2 分支）…",
             Dock = DockStyle.Fill, ForeColor = Color.Coral, BackColor = BackColor,
             TextAlign = ContentAlignment.MiddleCenter, Font = new Font("Microsoft YaHei", 20) };
         Controls.Add(loading);
@@ -79,7 +79,7 @@ internal sealed class GameWindow : Form
             settings.AreDefaultScriptDialogsEnabled = false;
             settings.IsBuiltInErrorPageEnabled = false;
             await core.AddScriptToExecuteOnDocumentCreatedAsync(
-                "window.__redProgress={infernoUnlocked:" + (ReadUnlock() ? "true" : "false") + ",campaign24Cleared:" + (ReadCampaign24() ? "true" : "false") + ",edition:\"redline-v2-m3\"};");
+                "window.__redProgress={infernoUnlocked:" + (ReadUnlock() ? "true" : "false") + ",campaign24Cleared:" + (ReadCampaign24() ? "true" : "false") + ",edition:\"redline-v3-m3\"};");
             core.WebMessageReceived += async delegate(object sender, CoreWebView2WebMessageReceivedEventArgs e)
             {
                 try
@@ -94,7 +94,7 @@ internal sealed class GameWindow : Form
                     if (valid != "true") return;
                     WriteUnlock(true);
                     await core.ExecuteScriptAsync(
-                        "window.__redProgress={infernoUnlocked:true,campaign24Cleared:true,edition:\"redline-v2-m3\"};if(typeof initDifficultyUI==='function')initDifficultyUI();if(typeof toast==='function')toast('地狱通关 · 炼狱难度已解锁','ok');");
+                        "window.__redProgress={infernoUnlocked:true,campaign24Cleared:true,edition:\"redline-v3-m3\"};if(typeof initDifficultyUI==='function')initDifficultyUI();if(typeof toast==='function')toast('地狱通关 · 炼狱难度已解锁','ok');");
                 }
                 catch (Exception)
                 {
@@ -135,7 +135,7 @@ internal sealed class GameWindow : Form
                 if (testMode && !tested) { tested = true; await RunTest(); }
             };
             string html;
-            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("game-v2.html"))
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("game-v3.html"))
             using (var reader = new StreamReader(stream, Encoding.UTF8)) html = reader.ReadToEnd();
             embeddedDocument = "data:text/html;charset=utf-8;base64," +
                 Convert.ToBase64String(Encoding.UTF8.GetBytes(html));
@@ -175,7 +175,7 @@ internal sealed class GameWindow : Form
   check(document.querySelectorAll('.diff-card').length===10,'Difficulty cards n=10');
   check(!!window.__M3MANIFEST&&window.__M3MANIFEST.goalTypes.length===3,'Runtime goal types n=3');
   check(!!window.__M3MANIFEST&&window.__M3MANIFEST.bossLevels.length===6,'Runtime boss levels n=6');
-  check(!!window.__REDLINE_BUILD__ && window.__REDLINE_BUILD__.edition==='redline-v2' && window.__REDLINE_BUILD__.aiLocked===true && window.__REDLINE_BUILD__.ai===false && document.title==='赤刃·重铸v2 实验版' && document.querySelectorAll('.diff-card').length>0,'Embedded redline-v2 edition; baseline list n='+document.querySelectorAll('.diff-card').length);
+  check(!!window.__REDLINE_BUILD__ && window.__REDLINE_BUILD__.edition==='redline-v3' && window.__REDLINE_BUILD__.aiLocked===true && window.__REDLINE_BUILD__.ai===false && document.title==='赤刃·重铸v3 实验版' && document.querySelectorAll('.diff-card').length>0,'Embedded redline-v3 edition; baseline list n='+document.querySelectorAll('.diff-card').length);
               __redTest.start();__redTest.clearEnemies();
               check(__redTest.state().state==='play','Game starts in native window');
               __redTest.spawn('chaser',P.x+65,P.y);en[0].hp=2000;en[0].maxHp=2000;en[0].spd=0;en[0].cd=100;
@@ -233,8 +233,8 @@ internal sealed class GameWindow : Form
   {
     try
     {
-      var json = File.ReadAllText(Path.Combine(DataDirectory, "progress-v2.json"));
-      if (json.IndexOf("redline-v2-m3", StringComparison.Ordinal) < 0) return false;   /* edition 必须为新版 */
+      var json = File.ReadAllText(Path.Combine(DataDirectory, "progress-v3.json"));
+      if (json.IndexOf("redline-v3-m3", StringComparison.Ordinal) < 0) return false;   /* edition 必须为新版 */
       return json.IndexOf("\"campaign24Cleared\":true", StringComparison.Ordinal) >= 0;  /* 旧 infernoUnlocked 不算 24 通关 */
     }
     catch { return false; }
@@ -243,7 +243,7 @@ internal sealed class GameWindow : Form
     {
         try
         {
-            string file = Path.Combine(DataDirectory, "progress-v2.json");
+            string file = Path.Combine(DataDirectory, "progress-v3.json");
             if (!File.Exists(file)) return false;
             var data = new JavaScriptSerializer().Deserialize<System.Collections.Generic.Dictionary<string, object>>(File.ReadAllText(file, Encoding.UTF8));
             object value;
@@ -255,10 +255,10 @@ internal sealed class GameWindow : Form
     private void WriteUnlock(bool unlocked)
     {
         Directory.CreateDirectory(DataDirectory);
-        string file = Path.Combine(DataDirectory, "progress-v2.json");
-        string temporary = Path.Combine(DataDirectory, "progress-v2.tmp");
+        string file = Path.Combine(DataDirectory, "progress-v3.json");
+        string temporary = Path.Combine(DataDirectory, "progress-v3.tmp");
         File.WriteAllText(temporary, new JavaScriptSerializer().Serialize(
-            new { version = 2, infernoUnlocked = unlocked, campaign24Cleared = unlocked, edition = "redline-v2-m3" }), new UTF8Encoding(false));
+            new { version = 2, infernoUnlocked = unlocked, campaign24Cleared = unlocked, edition = "redline-v3-m3" }), new UTF8Encoding(false));
         if (File.Exists(file)) File.Replace(temporary, file, null);
         else File.Move(temporary, file);
     }
@@ -266,7 +266,7 @@ internal sealed class GameWindow : Form
     private async Task RunRestoreTest()
     {
         string enabled = await view.CoreWebView2.ExecuteScriptAsync(
-            "window.__redProgress.campaign24Cleared === true && window.__redProgress.edition === \"redline-v2-m3\" && setDifficulty('inferno')");
+            "window.__redProgress.campaign24Cleared === true && window.__redProgress.edition === \"redline-v3-m3\" && setDifficulty('inferno')");
         bool passed = ReadCampaign24() && ReadUnlock() && enabled == "true";
         File.WriteAllText(testOutput, new JavaScriptSerializer().Serialize(new {
             passed = passed, unlockRestoredInNewProcess = passed, isolatedTestData = DataDirectory }), Encoding.UTF8);
@@ -277,8 +277,8 @@ internal sealed class GameWindow : Form
     private async Task RunUnlockTest()
     {
         WriteUnlock(false);
-        try { var p1 = Path.Combine(DataDirectory, "progress-v2.json"); if (File.Exists(p1)) File.Delete(p1); } catch { }
-        try { var p2 = Path.Combine(DataDirectory, "progress-v2.tmp"); if (File.Exists(p2)) File.Delete(p2); } catch { }
+        try { var p1 = Path.Combine(DataDirectory, "progress-v3.json"); if (File.Exists(p1)) File.Delete(p1); } catch { }
+        try { var p2 = Path.Combine(DataDirectory, "progress-v3.tmp"); if (File.Exists(p2)) File.Delete(p2); } catch { }
         await view.CoreWebView2.ExecuteScriptAsync("window.__redProgress={infernoUnlocked:false,campaign24Cleared:false};initDifficultyUI();");
         string locked = await view.CoreWebView2.ExecuteScriptAsync("document.querySelector('[data-diff=\"inferno\"]').disabled");
         await view.CoreWebView2.ExecuteScriptAsync("setDifficulty('hell');reset();G.state='over';G.win=true;G.wave=12;G.runStart=1;G.trialBoss=false;window.chrome.webview.postMessage({type:'campaign24-cleared'});");
@@ -296,8 +296,8 @@ internal sealed class GameWindow : Form
         await view.CoreWebView2.ExecuteScriptAsync("setDifficulty('hell');G.runDifficulty='hell';reset();G.state='over';G.win=true;G.wave=24;G.runStart=1;G.trialBoss=false;window.chrome.webview.postMessage({type:'campaign24-cleared'});");
         for (int i = 0; i < 60 && !ReadCampaign24(); i++) await Task.Delay(50);
         bool savedCampaign24 = ReadCampaign24() && ReadUnlock();
-        await view.CoreWebView2.ExecuteScriptAsync("window.__redProgress={infernoUnlocked:" + (ReadUnlock() ? "true" : "false") + ",campaign24Cleared:" + (ReadCampaign24() ? "true" : "false") + ",edition:\"redline-v2-m3\"};initDifficultyUI();");
-        string uiUnlocked = await view.CoreWebView2.ExecuteScriptAsync("window.__redProgress.campaign24Cleared === true && window.__redProgress.edition === 'redline-v2-m3'");
+        await view.CoreWebView2.ExecuteScriptAsync("window.__redProgress={infernoUnlocked:" + (ReadUnlock() ? "true" : "false") + ",campaign24Cleared:" + (ReadCampaign24() ? "true" : "false") + ",edition:\"redline-v3-m3\"};initDifficultyUI();");
+        string uiUnlocked = await view.CoreWebView2.ExecuteScriptAsync("window.__redProgress.campaign24Cleared === true && window.__redProgress.edition === 'redline-v3-m3'");
         bool passed = locked == "true" && rejectedLegacy12 && rejectedBossTrial && rejectedPartialRun && rejectedLoss && savedCampaign24 && uiUnlocked == "true";
         File.WriteAllText(testOutput, new JavaScriptSerializer().Serialize(new {
             passed = passed, initiallyLocked = locked == "true",
