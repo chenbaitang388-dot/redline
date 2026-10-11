@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+.game-data*/
+.progress*/
+.test-data*/
+build-v2-report.json
+game-v2.html
+Thumbs.db
+.DS_Store

@@ -1,0 +1,9 @@
+{
+  "name": "redline-game",
+  "version": "2.0.0-m3",
+  "private": true,
+  "description": "赤刃·重铸：Canvas 单机动作游戏，v2 M3 实验版",
+  "scripts": {
+    "build": "node src/build-release.js"
+  }
+}
