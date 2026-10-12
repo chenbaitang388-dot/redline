@@ -1,0 +1,15 @@
+{
+  "edition": "redline-v3-mobile",
+  "htmlSha256": "65BE30D157076F0BCA8354FE6DEDE8B18CAD39F860FE2CD34C31E5AF0DF521E0",
+  "htmlBytes": 275575,
+  "inputTests": {
+    "passed": 7,
+    "total": 7
+  },
+  "editorFeedbackTests": {
+    "passed": 10,
+    "total": 10
+  },
+  "verification": "Chromium browser automation and synthetic pointer/mechanism fixtures; physical Android/iPhone unverified",
+  "aiEnabled": false
+}
