@@ -1,0 +1,58 @@
+{
+  "name": "赤刃 · 重铸 v3（App 实验版）",
+  "short_name": "v3",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0b0709",
+  "theme_color": "#160c0a",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "appleTouchIcon": "./icons/apple-touch-icon.png",
+  "cache": {
+    "version": "redline-app-3a4f4c535a2f",
+    "precache": [
+      "./",
+      "./index.html",
+      "./manifest.webmanifest",
+      "./icons/icon.svg",
+      "./icons/icon-192.png",
+      "./icons/icon-512.png",
+      "./icons/apple-touch-icon.png"
+    ],
+    "failurePolicy": "precache failure rejected: not claiming offline readiness",
+    "updatePolicy": "new SW waits; SKIP_WAITING only after user confirms outside combat"
+  },
+  "controls": {
+    "dash": "cluster left = dash (Space)",
+    "block": "cluster right = block (E)",
+    "q": "cluster top-center = Q",
+    "attack": "bottom-right attack",
+    "cluster": "three small keys orbit attack key, 15deg counter-clockwise"
+  }
+}

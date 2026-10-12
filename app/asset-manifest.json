@@ -1,0 +1,42 @@
+{
+  "edition": "redline-app-pwa-experimental",
+  "version": "redline-app-3a4f4c535a2f",
+  "pageSha256": "2E6D5FD6E28104A354DBADF408708A259F67CE5255B1380466ED2BB5325387BE",
+  "files": {
+    "index.html": {
+      "sha256": "2e6d5fd6e28104a354dbadf408708a259f67ce5255b1380466ed2bb5325387be",
+      "bytes": 293064
+    },
+    "manifest.webmanifest": {
+      "sha256": "d1963de1e92793541e5abeca733bb42ae622cd732fc854292f7014e32339380c",
+      "bytes": 1516
+    },
+    "sw.js": {
+      "sha256": "324964494223549f73a45384c7074161aeedd08783aeaca5f677ce30ae5d6a3e",
+      "bytes": 1668
+    },
+    "icons/icon.svg": {
+      "sha256": "0107bbd037d5f55cde28beb3746de24a92bdaef0b0ba67974968f8198e4f6be0",
+      "bytes": 334
+    },
+    "icons/icon-192.png": {
+      "sha256": "bb4a8bb88ab4e7818b9493b92e7cbcb2d45eb29d77be3ade38407ecdd4ec6438",
+      "bytes": 9651
+    },
+    "icons/icon-512.png": {
+      "sha256": "949b33bfee972161d7378b61f6869550d6b1ab5f35efa8d42ede3ffcb0f1cb29",
+      "bytes": 26796
+    },
+    "icons/apple-touch-icon.png": {
+      "sha256": "0f4f3828b2a022a011806ca843e46bf50379e3160c1bb13498df03bb99d55287",
+      "bytes": 9062
+    }
+  },
+  "verification": {
+    "input": "9/9 Chromium automation",
+    "save": "5/5 independent Chromium/CDP automation",
+    "physicalPhones": "unverified",
+    "ipa": false
+  },
+  "note": "Manifest omits its own checksum; game/manifest/SW/icons hashes identify the frozen static build."
+}
